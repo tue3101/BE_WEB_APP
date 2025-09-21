@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: backend-plantshop
+  datasource:
+    url: jdbc:mysql://localhost:3306/plantshopdb
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+mybatis:
+  #link ??n file config xml
+  config-location: classpath:/static/mybatis/mybatis-config.xml
+  #link ??n file mapper
+  mapper-locations: classpath:/static/mybatis/mapper/*.xml
+
+server:
+  port: 1234
+
