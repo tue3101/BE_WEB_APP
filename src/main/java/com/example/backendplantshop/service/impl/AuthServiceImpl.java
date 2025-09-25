@@ -5,29 +5,29 @@ import com.example.backendplantshop.dto.request.users.ChangePasswordDtoRequest;
 import com.example.backendplantshop.dto.request.users.LoginDtoRequest;
 import com.example.backendplantshop.dto.request.users.RegisterDtoRequest;
 import com.example.backendplantshop.dto.respones.user.LoginDtoResponse;
+import com.example.backendplantshop.entity.UserTokens;
 import com.example.backendplantshop.entity.Users;
 import com.example.backendplantshop.enums.ErrorCode;
 import com.example.backendplantshop.exception.AppException;
 import com.example.backendplantshop.mapper.UserMapper;
 import com.example.backendplantshop.security.JwtUtil;
 import com.example.backendplantshop.service.intf.AuthenticationService;
-import lombok.AllArgsConstructor;
+import com.example.backendplantshop.service.intf.UserTokenService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class AuthServiceImpl implements AuthenticationService {
-    @Autowired
     private final UserMapper userMapper;
-    @Autowired
     private final PasswordEncoder passwordEncoder;
-
-    @Autowired
     private final JwtUtil jwtUtil;
+    private final UserTokenService userTokenService;
 
     private String clean(String input) {
         return (input != null && !input.trim().isEmpty()) ? input : null;
@@ -88,6 +88,13 @@ public class AuthServiceImpl implements AuthenticationService {
         String accessToken = jwtUtil.generateAccessToken(users.getUser_id(), users.getRole());
         String refreshToken = jwtUtil.generateRefreshToken(users.getUser_id());
 
+        // Lưu token vào DB
+        userTokenService.saveToken(UserTokens.builder()
+                .user_id(users.getUser_id())
+                .token(refreshToken) // chỉ lưu refreshToken trong DB
+                .expires_at(LocalDateTime.now().plusDays(7)) // hạn refresh token
+                .revoked(false)
+                .build());
         // Trả về accessToken + refreshToken
         return LoginDtoResponse.builder()
                 .accessToken(accessToken)
@@ -106,26 +113,50 @@ public class AuthServiceImpl implements AuthenticationService {
             throw new AppException(ErrorCode.AUTHENTICATION_ERROR);
         }
 
-
-
-        // xác thực refresh token: chỉ kiểm tra chữ ký + hạn + type
+        // Validate refresh token
         if (!jwtUtil.validateToken(token) || !jwtUtil.isRefreshToken(token)) {
             throw new AppException(ErrorCode.AUTHENTICATION_ERROR);
         }
 
         int id = jwtUtil.extractUserId(token);
-        // Query role từ DB
         String role = findRoleByUserId(id);
-        // Sinh access token mới
-        String newAccessToken = jwtUtil.generateAccessToken(id, role);
 
-        // Trả về cả access và refresh token
+        // Lấy token cũ từ DB (chưa revoke)
+        UserTokens existing = userTokenService.findTokenByUser(token, id);
+        if (existing == null || Boolean.TRUE.equals(existing.getRevoked())) {
+            throw new AppException(ErrorCode.TOKEN_HAS_EXPIRED);
+        }
+        if (existing.getExpires_at().isBefore(LocalDateTime.now())) {
+            throw new AppException(ErrorCode.TOKEN_HAS_EXPIRED);
+        }
+
+        //Sinh cặp token mới
+        String newAccessToken = jwtUtil.generateAccessToken(id, role);
+        String newRefreshToken = jwtUtil.generateRefreshToken(id);
+
+        //Lưu token mới
+        userTokenService.saveToken(UserTokens.builder()
+                .user_id(id)
+                .token(newRefreshToken)
+                .expires_at(LocalDateTime.now().plusDays(7))
+                .revoked(false)
+                .created_at(LocalDateTime.now())
+                .build());
+
+        //Revoke token cũ (dùng object existing đã lấy từ DB)
+        boolean revoked = userTokenService.revokeTokenById(existing.getToken_id());
+//        if(!revoked) {
+//            throw new AppException(ErrorCode.TOKEN_REVOKED);
+//        }
+
+        //Trả về token mới
         return LoginDtoResponse.builder()
                 .accessToken(newAccessToken)
-                .refreshToken(token) // giữ refresh token cũ, hoặc có thể rotate tại đây
+                .refreshToken(newRefreshToken)
                 .build();
     }
-//    @Override
+
+    //    @Override
 //    public void changePassword(ChangePasswordDtoRequest changePasswordDtoRequest, String authHeader) {
 //        try{
 //            // Lấy token từ Authorization header
@@ -203,6 +234,26 @@ public class AuthServiceImpl implements AuthenticationService {
             throw new AppException(ErrorCode.USER_NOT_EXISTS);
         }
         return users.getRole();
+    }
+
+
+    @Override
+    public void logout(String authHeader) {
+        String token = (authHeader != null && authHeader.startsWith("Bearer "))
+                ? authHeader.substring(7)
+                : null;
+
+        if (token == null) {
+            throw new AppException(ErrorCode.AUTHENTICATION_ERROR);
+        }
+
+        if(jwtUtil.isAccessToken(token)) {
+            int id = jwtUtil.extractUserId(token);
+            userTokenService.revokeTokensByUser(id);
+        }
+        else {
+            throw new AppException(ErrorCode.AUTHENTICATION_ERROR);
+        }
     }
 
 }

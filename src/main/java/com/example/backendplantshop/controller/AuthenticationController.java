@@ -58,4 +58,14 @@ public class AuthenticationController {
                 .data(response)
                 .build();
     }
+
+    @PostMapping("/logout")
+    ApiResponse<Void> logout(@RequestHeader("Authorization") String authHeader) {
+        authenticationService.logout(authHeader);
+        return ApiResponse.<Void>builder()
+                .statusCode(ErrorCode.LOGIN_SUCCESSFULL.getCode())
+                .success(Boolean.TRUE)
+                .message("đăng xuất thành công")
+                .build();
+    }
 }

@@ -8,6 +8,7 @@ import lombok.Getter;
 public enum ErrorCode {
 
     TOKEN_HAS_EXPIRED(401,"token đã hết hạn, vui lòng đăng nhập lại!"),
+    TOKEN_REVOKED(401,"token đã bị vô hiệu hóa"),
     TOKEN_NOT_EXISTS(401,"token không tồn tại!"),
     TOKEN_ALREADY_REVOKED(401,"token đã bị vô hiệu hóa!"),
     AUTHENTICATION_ERROR(401, "lỗi xác thực"),

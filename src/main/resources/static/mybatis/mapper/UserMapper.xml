@@ -17,7 +17,7 @@
         <result column="is_deleted" property="is_deleted"/>
 
         <collection property="user_tokens" ofType="UserTokens" column="user_id"
-                    select="com.example.mapper.UserTokensMapper.findByUserId"/>
+                    select="com.example.backendplantshop.mapper.UserTokenMapper.findTokensByUserId"/>
     </resultMap>
     <!-- Các phần tử SQL-->
 

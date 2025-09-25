@@ -1,6 +1,5 @@
 package com.example.backendplantshop.entity;
 
-import com.example.backendplantshop.enums.TokenType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +15,6 @@ public class UserTokens {
     private int token_id;
     private int user_id;
     private String token;
-    private TokenType type;
     private LocalDateTime expires_at;
     private Boolean revoked;
     private LocalDateTime created_at;
