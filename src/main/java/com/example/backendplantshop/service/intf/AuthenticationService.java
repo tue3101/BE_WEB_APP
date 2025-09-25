@@ -7,6 +7,7 @@ import com.example.backendplantshop.dto.respones.user.LoginDtoResponse;
 
 public interface AuthenticationService {
     void register(RegisterDtoRequest registerDtoRequest);
+    void logout(String authHeader);
     LoginDtoResponse login(LoginDtoRequest loginDtoRequest);
     String findRoleByUserId(int id);
     LoginDtoResponse refresh(String refreshToken);

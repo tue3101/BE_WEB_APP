@@ -8,7 +8,6 @@
         <id column="token_id" property="token_id"/>
         <result column="user_id" property="user_id"/>
         <result column="token" property="token"/>
-        <result column="type" property="type"/>
         <result column="expired_at" property="expires_at"/>
         <result column="revoked" property="revoked"/>
         <result column="created_at" property="created_at"/>
@@ -17,19 +16,15 @@
     <!-- Các phần tử SQL-->
 
 
-    <select id="findByUserIdAndType" resultMap="UserTokenResultMap">
-        SELECT * FROM user_tokens WHERE user_id = #{userId} AND type = #{type} AND revoked = FALSE
-    </select>
+
     <insert id="insertToken" >
         INSERT INTO user_tokens( user_id
                                , token
-                               , type
                                , expired_at
                                , revoked)
         VALUES (
                 #{user_id}
                , #{token}
-               , #{type}
                , #{expires_at}
                , #{revoked}
                )
@@ -58,6 +53,18 @@
         SELECT *
         FROM user_tokens
         WHERE token = #{token}
+            LIMIT 1
+    </select>
+
+<!--    tìm token bằng user_id-->
+    <select id="findTokensByUserId" resultMap="UserTokenResultMap">
+        SELECT *
+        FROM user_tokens
+        WHERE user_id = #{userId}
+          AND token = #{token}
+        AND revoked = false
+          AND expired_at > NOW()
+
             LIMIT 1
     </select>
 

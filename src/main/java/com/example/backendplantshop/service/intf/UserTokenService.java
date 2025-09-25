@@ -6,9 +6,10 @@ import java.util.List;
 
 public interface UserTokenService {
     void saveToken(UserTokens token);
-    void revokeTokenById(int tokenId);
-    void revokeTokensByUser(int userId);
+    boolean revokeTokenById(int tokenId);
+    UserTokens revokeTokensByUser(int userId);
     UserTokens findByToken(String token);
     UserTokens findById(int tokenId);
+    UserTokens findTokenByUser(String token,int userId);
     List<UserTokens> findValidTokensByUser(int userId);
 }
