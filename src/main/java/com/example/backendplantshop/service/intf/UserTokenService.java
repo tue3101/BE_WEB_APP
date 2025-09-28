@@ -10,6 +10,9 @@ public interface UserTokenService {
     UserTokens revokeTokensByUser(int userId);
     UserTokens findByToken(String token);
     UserTokens findById(int tokenId);
-    UserTokens findTokenByUser(String token,int userId);
+    UserTokens findTokenByUser(Integer userId);
+
+
+
     List<UserTokens> findValidTokensByUser(int userId);
 }

@@ -37,10 +37,6 @@ public class UserTokenServiceImpl implements UserTokenService {
 
     @Override
     public UserTokens revokeTokensByUser(int userId) {
-        List<UserTokens> tokens = userTokenMapper.findValidTokensByUser(userId, LocalDateTime.now());
-        if (tokens == null || tokens.isEmpty()) {
-            throw new AppException(ErrorCode.TOKEN_HAS_EXPIRED);
-        }
         userTokenMapper.revokeTokensByUser(userId);
         return null;
     }
@@ -64,11 +60,11 @@ public class UserTokenServiceImpl implements UserTokenService {
     }
 
     @Override
-    public UserTokens findTokenByUser(String token, int userId) {
-        if (token == null) {
+    public UserTokens findTokenByUser(Integer userId) {
+        if (userId == null) {
             throw  new AppException(ErrorCode.USER_NOT_EXISTS);
         }
-        return userTokenMapper.findTokensByUserId(token, userId);
+        return userTokenMapper.findTokensByUserId(userId);
     }
 
 

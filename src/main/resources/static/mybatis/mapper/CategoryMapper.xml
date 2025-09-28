@@ -12,7 +12,7 @@
         <result column="is_deleted" property="is_deleted"/>
         
         
-        
+<!--    dùng cho mối quan hệ 1-n-->
         <collection property="products" ofType="Products">
             <id column="product_id" property="product_id"/>
             <result column="product_name" property="product_name"/>

@@ -18,7 +18,7 @@ public interface UserTokenMapper {
     UserTokens findByToken(@Param("token") String token);
 
     UserTokens findById(@Param("tokenId") int tokenId); // 🔥 thêm mới
-    UserTokens findTokensByUserId(@Param("token") String token, @Param("userId") int userId);
+    UserTokens findTokensByUserId( @Param("userId") int userId);
 
 
     List<UserTokens> findValidTokensByUser(@Param("userId") int userId,

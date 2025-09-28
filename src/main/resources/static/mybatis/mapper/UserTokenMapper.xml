@@ -57,16 +57,14 @@
     </select>
 
 <!--    tìm token bằng user_id-->
-    <select id="findTokensByUserId" resultMap="UserTokenResultMap">
-        SELECT *
-        FROM user_tokens
-        WHERE user_id = #{userId}
-          AND token = #{token}
-        AND revoked = false
-          AND expired_at > NOW()
-
-            LIMIT 1
-    </select>
+        <select id="findTokensByUserId" resultMap="UserTokenResultMap">
+                SELECT *
+                FROM user_tokens
+                WHERE user_id = #{userId}
+                    AND revoked = false
+                ORDER BY expired_at DESC
+                LIMIT 1
+        </select>
 
     <!-- Lấy danh sách token hợp lệ (chưa hết hạn & chưa bị revoke) -->
     <select id="findValidTokensByUser" resultType="UserTokens">

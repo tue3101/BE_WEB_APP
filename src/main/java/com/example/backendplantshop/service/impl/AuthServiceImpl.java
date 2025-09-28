@@ -119,41 +119,29 @@ public class AuthServiceImpl implements AuthenticationService {
         }
 
         int id = jwtUtil.extractUserId(token);
-        String role = findRoleByUserId(id);
+        String role = jwtUtil.extractRole(token);
 
         // Lấy token cũ từ DB (chưa revoke)
-        UserTokens existing = userTokenService.findTokenByUser(token, id);
+        UserTokens existing = userTokenService.findTokenByUser(id);
         if (existing == null || Boolean.TRUE.equals(existing.getRevoked())) {
-            throw new AppException(ErrorCode.TOKEN_HAS_EXPIRED);
+            throw new AppException(ErrorCode.TOKEN_REVOKED);
         }
+        // revoke token cũ
         if (existing.getExpires_at().isBefore(LocalDateTime.now())) {
+            userTokenService.revokeTokensByUser(id);
             throw new AppException(ErrorCode.TOKEN_HAS_EXPIRED);
         }
 
-        //Sinh cặp token mới
+
+
+
+        // Nếu refresh token chưa hết hạn thì trả về lại refresh token cũ
         String newAccessToken = jwtUtil.generateAccessToken(id, role);
-        String newRefreshToken = jwtUtil.generateRefreshToken(id);
-
-        //Lưu token mới
-        userTokenService.saveToken(UserTokens.builder()
-                .user_id(id)
-                .token(newRefreshToken)
-                .expires_at(LocalDateTime.now().plusDays(7))
-                .revoked(false)
-                .created_at(LocalDateTime.now())
-                .build());
-
-        //Revoke token cũ (dùng object existing đã lấy từ DB)
-        boolean revoked = userTokenService.revokeTokenById(existing.getToken_id());
-//        if(!revoked) {
-//            throw new AppException(ErrorCode.TOKEN_REVOKED);
-//        }
-
-        //Trả về token mới
         return LoginDtoResponse.builder()
                 .accessToken(newAccessToken)
-                .refreshToken(newRefreshToken)
+                .refreshToken(existing.getToken())
                 .build();
+
     }
 
     //    @Override
@@ -227,14 +215,14 @@ public class AuthServiceImpl implements AuthenticationService {
     }
 
 
-    @Override
-    public String findRoleByUserId(int id) {
-        Users users = userMapper.findById(id);
-        if (users == null) {
-            throw new AppException(ErrorCode.USER_NOT_EXISTS);
-        }
-        return users.getRole();
-    }
+//    @Override
+//    public String findRoleByUserId(int id) {
+//        Users users = userMapper.findById(id);
+//        if (users == null) {
+//            throw new AppException(ErrorCode.USER_NOT_EXISTS);
+//        }
+//        return users.getRole();
+//    }
 
 
     @Override
