@@ -21,3 +21,8 @@ mybatis:
 server:
   port: 1234
 
+#logging:
+#  level:
+#    com.example.backendplantshop: DEBUG
+#    root: DEBUG
+

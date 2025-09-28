@@ -10,24 +10,69 @@
         <result column="is_deleted" property="is_deleted"/>
 
 
+<!--        dùng cho mối quan hệ 1-1-->
         <association property="users" javaType="Users">
             <id property="user_id" column="user_id"/>
-            <result property="email" column="email"/>
-            <result property="username" column="username"/>
-            <result property="phone_number" column="phone_number"/>
         </association>
+
+        <!-- 1-n: Cart -> CartDetails -->
+        <collection property="cart_details" ofType="CartDetails">
+            <id property="cart_detail_id" column="cart_detail_id"/>
+            <result property="product_id" column="product_id"/>
+            <result property="quantity" column="quantity"/>
+            <result property="selected" column="selected"/>
+            <result property="created_at" column="cd_created_at"/>
+            <result property="updated_at" column="cd_updated_at"/>
+            <result property="is_deleted" column="is_deleted"/>
+            <result property="cart_id" column="cd_cart_id"/>
+        </collection>
     </resultMap>
     <!-- Các phần tử SQL-->
-    <select id="findCartByUserId" resultMap="CartResultMap">
-        SELECT c.cart_id,
-            u.user_id,
-               u.username,
-               u.email,
-               u.phone_number
+<!--    <select id="findCartByUserId" resultMap="CartResultMap">-->
+<!--        SELECT c.cart_id,-->
+<!--            u.user_id,-->
+<!--               u.username,-->
+<!--               u.email,-->
+<!--               u.phone_number-->
+<!--        FROM carts c-->
+<!--        LEFT JOIN users u ON u.user_id=c.user_id-->
+<!--        WHERE u.user_id=#{userID}-->
+<!--    </select>-->
+
+    <select id="findCartByUserId" parameterType="map" resultMap="CartResultMap">
+        SELECT
+            c.cart_id,
+            c.user_id,
+
+            cd.cart_detail_id,
+            cd.product_id,
+            cd.quantity,
+            cd.selected,
+            cd.created_at AS cd_created_at,
+            cd.updated_at AS cd_updated_at,
+            cd.is_deleted,
+            cd.cart_id AS cd_cart_id
         FROM carts c
-        LEFT JOIN users u ON u.user_id=c.user_id
-        WHERE u.user_id=#{userID}
+                 LEFT JOIN users u ON c.user_id = u.user_id
+                 LEFT JOIN cart_details cd ON c.cart_id = cd.cart_id
+        WHERE c.user_id = #{userID}
+        ANd c.is_deleted = false
     </select>
+    <!-- Tìm cart_id theo user_id -->
+    <select id="findCartIdByUserId" parameterType="int" resultType="int">
+        SELECT cart_id
+        FROM carts
+        WHERE user_id = #{userId}
+          AND is_deleted = false
+            LIMIT 1
+    </select>
+
+    <!-- Tạo giỏ hàng mới cho user -->
+    <insert id="createCartForUser" parameterType="int" >
+        INSERT INTO carts (user_id)
+        VALUES (#{userId})
+    </insert>
+
 
 
 

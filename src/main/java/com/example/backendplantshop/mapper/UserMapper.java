@@ -1,10 +1,12 @@
 package com.example.backendplantshop.mapper;
 
 import com.example.backendplantshop.entity.Users;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+@Mapper
 public interface UserMapper {
     Users findByEmail(String email);
     Users findByPhoneNumber(String phoneNumber);

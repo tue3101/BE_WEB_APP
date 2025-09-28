@@ -9,7 +9,7 @@ public interface AuthenticationService {
     void register(RegisterDtoRequest registerDtoRequest);
     void logout(String authHeader);
     LoginDtoResponse login(LoginDtoRequest loginDtoRequest);
-    String findRoleByUserId(int id);
+//    String findRoleByUserId(int id);
     LoginDtoResponse refresh(String refreshToken);
     void changePassword(ChangePasswordDtoRequest changePasswordDtoRequest, String authHeader);
 }
