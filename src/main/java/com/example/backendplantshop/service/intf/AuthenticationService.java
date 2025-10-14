@@ -3,7 +3,7 @@ package com.example.backendplantshop.service.intf;
 import com.example.backendplantshop.dto.request.users.ChangePasswordDtoRequest;
 import com.example.backendplantshop.dto.request.users.LoginDtoRequest;
 import com.example.backendplantshop.dto.request.users.RegisterDtoRequest;
-import com.example.backendplantshop.dto.respones.user.LoginDtoResponse;
+import com.example.backendplantshop.dto.response.user.LoginDtoResponse;
 
 public interface AuthenticationService {
     void register(RegisterDtoRequest registerDtoRequest);

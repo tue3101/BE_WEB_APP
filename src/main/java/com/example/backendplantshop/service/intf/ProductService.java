@@ -1,7 +1,7 @@
 package com.example.backendplantshop.service.intf;
 
 import com.example.backendplantshop.dto.request.ProductDtoRequest;
-import com.example.backendplantshop.dto.respones.ProductDtoResponse;
+import com.example.backendplantshop.dto.response.ProductDtoResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;

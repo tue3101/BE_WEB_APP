@@ -1,4 +1,4 @@
-package com.example.backendplantshop.dto.respones;
+package com.example.backendplantshop.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;

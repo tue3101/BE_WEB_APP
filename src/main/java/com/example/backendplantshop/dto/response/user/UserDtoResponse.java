@@ -1,4 +1,4 @@
-package com.example.backendplantshop.dto.respones.user;
+package com.example.backendplantshop.dto.response.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

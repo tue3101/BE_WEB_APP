@@ -4,7 +4,7 @@ import com.example.backendplantshop.convert.UserConvert;
 import com.example.backendplantshop.dto.request.users.ChangePasswordDtoRequest;
 import com.example.backendplantshop.dto.request.users.LoginDtoRequest;
 import com.example.backendplantshop.dto.request.users.RegisterDtoRequest;
-import com.example.backendplantshop.dto.respones.user.LoginDtoResponse;
+import com.example.backendplantshop.dto.response.user.LoginDtoResponse;
 import com.example.backendplantshop.entity.UserTokens;
 import com.example.backendplantshop.entity.Users;
 import com.example.backendplantshop.enums.ErrorCode;
@@ -15,6 +15,9 @@ import com.example.backendplantshop.service.intf.AuthenticationService;
 import com.example.backendplantshop.service.intf.UserTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,9 +32,43 @@ public class AuthServiceImpl implements AuthenticationService {
     private final JwtUtil jwtUtil;
     private final UserTokenService userTokenService;
 
-    private String clean(String input) {
+    public String clean(String input) {
         return (input != null && !input.trim().isEmpty()) ? input : null;
     }
+    // ===== Helpers: lấy thông tin từ token trong SecurityContext =====
+    public int getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new AppException(ErrorCode.AUTHENTICATION_ERROR);
+        }
+        try {
+            return Integer.parseInt(authentication.getPrincipal().toString());
+        } catch (NumberFormatException e) {
+            throw new AppException(ErrorCode.AUTHENTICATION_ERROR);
+        }
+    }
+
+    public String getCurrentRole() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            throw new AppException(ErrorCode.AUTHENTICATION_ERROR);
+        }
+        for (GrantedAuthority auth : authentication.getAuthorities()) {
+            String authority = auth.getAuthority(); // dạng ROLE_USER / ROLE_ADMIN
+            if (authority != null && authority.startsWith("ROLE_")) {
+                return authority.substring(5);
+            }
+        }
+        throw new AppException(ErrorCode.AUTHENTICATION_ERROR);
+    }
+    public boolean isUser(String role) {
+        return "USER".equalsIgnoreCase(role);
+    }
+
+    public boolean isAdmin(String role) {
+        return "ADMIN".equalsIgnoreCase(role);
+    }
+
 
     public void register(RegisterDtoRequest registerDtoRequest) {
         if (registerDtoRequest == null) {
@@ -86,7 +123,7 @@ public class AuthServiceImpl implements AuthenticationService {
 
         // Cả access và refresh đều không dùng được → cấp cặp token mới
         String accessToken = jwtUtil.generateAccessToken(users.getUser_id(), users.getRole());
-        String refreshToken = jwtUtil.generateRefreshToken(users.getUser_id());
+        String refreshToken = jwtUtil.generateRefreshToken(users.getUser_id(), users.getRole());
 
         // Lưu token vào DB
         userTokenService.saveToken(UserTokens.builder()
@@ -114,9 +151,9 @@ public class AuthServiceImpl implements AuthenticationService {
         }
 
         // Validate refresh token
-        if (!jwtUtil.validateToken(token) || !jwtUtil.isRefreshToken(token)) {
-            throw new AppException(ErrorCode.AUTHENTICATION_ERROR);
-        }
+//        if (!jwtUtil.validateToken(token) || !jwtUtil.isRefreshToken(token)) {
+//            throw new AppException(ErrorCode.AUTHENTICATION_ERROR);
+//        }
 
         int id = jwtUtil.extractUserId(token);
         String role = jwtUtil.extractRole(token);
@@ -131,9 +168,6 @@ public class AuthServiceImpl implements AuthenticationService {
             userTokenService.revokeTokensByUser(id);
             throw new AppException(ErrorCode.TOKEN_HAS_EXPIRED);
         }
-
-
-
 
         // Nếu refresh token chưa hết hạn thì trả về lại refresh token cũ
         String newAccessToken = jwtUtil.generateAccessToken(id, role);
@@ -188,7 +222,7 @@ public class AuthServiceImpl implements AuthenticationService {
                 ? authHeader.substring(7)
                 : null;
 
-        if (token == null || !jwtUtil.validateToken(token) || !jwtUtil.isAccessToken(token)) {
+        if (token == null ) {
             throw new AppException(ErrorCode.AUTHENTICATION_ERROR);
         }
         // Lấy thông tin user từ token

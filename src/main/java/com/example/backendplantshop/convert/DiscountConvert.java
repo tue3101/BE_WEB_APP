@@ -1,7 +1,7 @@
 package com.example.backendplantshop.convert;
 
 import com.example.backendplantshop.dto.request.DiscountDtoRequest;
-import com.example.backendplantshop.dto.respones.DiscountDtoResponse;
+import com.example.backendplantshop.dto.response.DiscountDtoResponse;
 import com.example.backendplantshop.entity.Discounts;
 
 

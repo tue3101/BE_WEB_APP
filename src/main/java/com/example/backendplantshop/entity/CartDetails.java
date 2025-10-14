@@ -1,5 +1,7 @@
 package com.example.backendplantshop.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,9 +23,9 @@ public class CartDetails {
     private Boolean is_deleted;
     private int cart_id;
 
-//    @JsonManagedReference
+    @JsonManagedReference
     private Products products;
 
-//    @JsonBackReference
+    @JsonBackReference
     private Carts cart;
 }

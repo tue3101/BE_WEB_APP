@@ -56,6 +56,11 @@ public enum ErrorCode {
     PRODUCT_ALREADY_EXISTS(1003, "sản phẩm đã tồn tại"),
     DISCOUNT_ALREADY_EXISTS(1003, "mã khuyến mãi đã tồn tại"),
 
+
+    QUANTITY_IS_NOT_ENOUGH(1004, "số lượng sản phẩm trong kho không đủ"),
+    INVALID_QUANTITY(1004, "số lượng sản phẩm phải >=1"),
+
+
 //    ========================================================================
     BAD_SQL(500, "Sai syntax SQL"),
     NULL_POINTER(500, "Loi Null Pointer"),

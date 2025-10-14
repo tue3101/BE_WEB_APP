@@ -1,9 +1,8 @@
 package com.example.backendplantshop.controller;
 
-import com.example.backendplantshop.dto.respones.ApiResponse;
+import com.example.backendplantshop.dto.response.ApiResponse;
 import com.example.backendplantshop.entity.Carts;
 import com.example.backendplantshop.enums.ErrorCode;
-import com.example.backendplantshop.security.annotations.RequireUserOrAdmin;
 import com.example.backendplantshop.service.intf.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +14,6 @@ public class CartController {
     private final CartService cartService;
 
     @GetMapping("get-cart-of-user/{userID}")
-    @RequireUserOrAdmin
     ApiResponse<Carts> findCartByUserId(@PathVariable("userID") int userId,
                                        @RequestHeader("Authorization") String authHeader) {
         Carts cart = cartService.findCartByUserId(userId, authHeader);

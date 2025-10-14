@@ -15,6 +15,7 @@ public interface UserTokenMapper {
 
     void revokeTokensByUser(@Param("userId") int userId);
 
+
     UserTokens findByToken(@Param("token") String token);
 
     UserTokens findById(@Param("tokenId") int tokenId); // 🔥 thêm mới
@@ -23,5 +24,7 @@ public interface UserTokenMapper {
 
     List<UserTokens> findValidTokensByUser(@Param("userId") int userId,
                                            @Param("now") LocalDateTime now);
+    
+                                           
 
 }

@@ -1,11 +1,9 @@
 package com.example.backendplantshop.controller;
 
 import com.example.backendplantshop.dto.request.DiscountDtoRequest;
-import com.example.backendplantshop.dto.respones.ApiResponse;
-import com.example.backendplantshop.dto.respones.DiscountDtoResponse;
+import com.example.backendplantshop.dto.response.ApiResponse;
+import com.example.backendplantshop.dto.response.DiscountDtoResponse;
 import com.example.backendplantshop.enums.ErrorCode;
-import com.example.backendplantshop.security.annotations.RequireAdmin;
-import com.example.backendplantshop.security.annotations.RequireUserOrAdmin;
 import com.example.backendplantshop.service.intf.DiscountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +20,6 @@ public class DiscountController {
     private final DiscountService discountService;
 
     @GetMapping("getbyid/{id}")
-    @RequireUserOrAdmin
     public ApiResponse<DiscountDtoResponse> doGetById(@PathVariable("id") int id) {
         return ApiResponse.<DiscountDtoResponse>builder()
                 .statusCode(ErrorCode.CALL_API_SUCCESSFULL.getCode())
@@ -34,7 +31,6 @@ public class DiscountController {
     }
 
     @GetMapping("/getall")
-    @RequireUserOrAdmin
     public ApiResponse<List<DiscountDtoResponse>> doGetAllDiscounts() {
         return ApiResponse.<List<DiscountDtoResponse>>builder()
                 .statusCode(ErrorCode.CALL_API_SUCCESSFULL.getCode())
@@ -47,7 +43,6 @@ public class DiscountController {
     }
 
     @PostMapping("/add")
-    @RequireAdmin
     public ApiResponse<Void> doInsertDiscount(@Valid @RequestBody DiscountDtoRequest discountRequest) {
 
         discountService.insert(discountRequest);
@@ -60,7 +55,6 @@ public class DiscountController {
     }
 
     @PutMapping("/update/{id}")
-    @RequireAdmin
     public ApiResponse<Void> doUpdateDiscount( @PathVariable("id") int id,@Valid @RequestBody DiscountDtoRequest discountRequest) {
 
         discountService.update(id, discountRequest);
@@ -73,7 +67,6 @@ public class DiscountController {
     }
 
     @DeleteMapping("/delete/{id}")
-    @RequireAdmin
     public ApiResponse<Void> doDeleteDiscount(@PathVariable("id") int id) {
         discountService.delete(id);
         return ApiResponse.<Void>builder()
@@ -84,7 +77,6 @@ public class DiscountController {
     }
 
     @PutMapping("/restore/{id}")
-    @RequireAdmin
     ApiResponse<Void> restore(@PathVariable("id") int id) {
         discountService.restoreDiscount(id);
         return ApiResponse.<Void>builder()

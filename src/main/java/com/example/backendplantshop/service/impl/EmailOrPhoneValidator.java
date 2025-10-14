@@ -6,7 +6,11 @@ import com.example.backendplantshop.dto.request.users.UserDtoRequest;
 import com.example.backendplantshop.service.intf.ValidEmailOrPhone;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
+@RequiredArgsConstructor
 public class EmailOrPhoneValidator implements ConstraintValidator<ValidEmailOrPhone, Object> {
 
     private String messageTemplate;

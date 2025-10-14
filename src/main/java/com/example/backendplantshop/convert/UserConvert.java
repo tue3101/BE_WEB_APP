@@ -2,7 +2,7 @@ package com.example.backendplantshop.convert;
 
 import com.example.backendplantshop.dto.request.users.RegisterDtoRequest;
 import com.example.backendplantshop.dto.request.users.UserDtoRequest;
-import com.example.backendplantshop.dto.respones.user.UserDtoResponse;
+import com.example.backendplantshop.dto.response.user.UserDtoResponse;
 import com.example.backendplantshop.entity.Users;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
