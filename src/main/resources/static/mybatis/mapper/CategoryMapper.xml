@@ -95,6 +95,13 @@
         WHERE category_id = #{categoryID}
           AND is_deleted = true
     </select>
+    <!-- Đếm số sản phẩm trong danh mục -->
+    <select id="countProductsByCategory" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM products
+        WHERE category_id = #{categoryID}
+          AND is_deleted = false
+    </select>
     <update id="restoreCategory" parameterType="int">
         UPDATE category
         SET is_deleted = 0,

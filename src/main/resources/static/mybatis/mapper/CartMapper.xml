@@ -81,8 +81,7 @@
 </delete>
     <update id="restoreByUserId" parameterType="int">
         UPDATE carts
-        SET is_deleted = 0,
-            updated_at = CURRENT_TIMESTAMP
+        SET is_deleted = 0
         WHERE user_id = #{userID}
     </update>
 

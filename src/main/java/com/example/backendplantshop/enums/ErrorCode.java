@@ -42,6 +42,9 @@ public enum ErrorCode {
     NOT_DELETE(409, "chưa bị xóa hoặc không tồn tại"),
 
 //    ======================================================================
+// ErrorCode.java
+
+    CATEGORY_HAS_PRODUCTS(1000,"Danh mục vẫn còn sản phẩm, không thể xóa"),
 
     LIST_NOT_FOUND(1000, "Danh sách rỗng"),
     NAME_EMPTY(1001, "tên không được để trống"),
