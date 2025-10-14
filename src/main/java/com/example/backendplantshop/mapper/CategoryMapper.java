@@ -19,4 +19,6 @@ public interface CategoryMapper {
 
     Category findByIdDeleted(@Param("categoryID")int id);
     void restoreCategory(@Param("categoryID")int id);
+    Integer countProductsByCategory(@Param("categoryID") int categoryId);
+
 }

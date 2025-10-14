@@ -105,6 +105,10 @@ public class CategoryServiceImpl implements CategoryService {
         if (categoryMapper.findById(id) == null) {
             throw new AppException(ErrorCode.CATEGORY_NOT_EXISTS);
         }
+        Integer productCount = categoryMapper.countProductsByCategory(id);
+        if(productCount!=null&& productCount>0){
+            throw new AppException(ErrorCode.CATEGORY_HAS_PRODUCTS);
+        }
         categoryMapper.delete(id);
     }
 
