@@ -1,17 +1,15 @@
 package com.example.backendplantshop.service.impl;
 
 import com.example.backendplantshop.dto.request.ProductDtoRequest;
-import com.example.backendplantshop.dto.respones.ProductDtoResponse;
+import com.example.backendplantshop.dto.response.ProductDtoResponse;
 import com.example.backendplantshop.entity.Products;
 import com.example.backendplantshop.enums.ErrorCode;
 import com.example.backendplantshop.exception.AppException;
-import com.example.backendplantshop.mapper.CategoryMapper;
 import com.example.backendplantshop.mapper.ProductMapper;
 import com.example.backendplantshop.convert.ProductConvert;
 import com.example.backendplantshop.service.intf.ProductService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,15 +19,14 @@ import java.util.List;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
+
 public class ProductServiceImpl implements ProductService {
-    @Autowired
     private final ProductMapper productMapper;
-    
-    @Autowired
+    private final AuthServiceImpl authService;
+
+
     private final CategoryServiceImpl categoryServiceImpl;
-    @Autowired
-    private CategoryMapper categoryMapper;
 
 
     public ProductDtoResponse findProductById(int id){
@@ -49,6 +46,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     public void insert(ProductDtoRequest productRequest, MultipartFile image) throws IOException {
+        String role = authService.getCurrentRole();
+        if (!authService.isAdmin(role) ) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
         // Validate input - kiểm tra các trường bắt buộc
         if (productRequest.getProduct_name() == null || productRequest.getProduct_name().trim().isEmpty()) {
             throw new AppException(ErrorCode.MISSING_REQUIRED_FIELD);
@@ -75,13 +76,14 @@ public class ProductServiceImpl implements ProductService {
         if (categoryServiceImpl.findById(productRequest.getCategory_id()) == null) {
             throw new AppException(ErrorCode.CATEGORY_NOT_EXISTS);
         }
-        
+
         // Kiểm tra sản phẩm trùng tên, size và danh mục
         Products existingProduct = productMapper.findByProductNameAndSize(
             productRequest.getProduct_name(), 
             productRequest.getSize(),
             productRequest.getCategory_id()
         );
+
         if (existingProduct != null) {
             throw new AppException(ErrorCode.PRODUCT_ALREADY_EXISTS);
         }
@@ -158,6 +160,10 @@ public class ProductServiceImpl implements ProductService {
 //        productMapper.update(updatedProduct);
 //    }
     public void update(int id, ProductDtoRequest productRequest, MultipartFile image) throws IOException {
+        String role = authService.getCurrentRole();
+        if (!authService.isAdmin(role) ) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
         // Validate input - kiểm tra các trường bắt buộc
         if (productRequest.getProduct_name() == null || productRequest.getProduct_name().trim().isEmpty()) {
             throw new AppException(ErrorCode.MISSING_REQUIRED_FIELD);
@@ -211,6 +217,10 @@ public class ProductServiceImpl implements ProductService {
 
 
     public void delete(int id){
+        String role = authService.getCurrentRole();
+        if (!authService.isAdmin(role) ) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
         if(productMapper.findById(id)==null){
             throw new AppException(ErrorCode.PRODUCT_NOT_EXISTS);
         }
@@ -244,6 +254,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void restoreProduct(int id) {
+        String role = authService.getCurrentRole();
+        if (!authService.isAdmin(role) ) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
         if(productMapper.findByIdDeleted(id) == null){
             throw new AppException(ErrorCode.NOT_DELETE);
         }

@@ -1,11 +1,9 @@
 package com.example.backendplantshop.service.intf;
 
 
-import com.example.backendplantshop.dto.request.users.LoginDtoRequest;
-import com.example.backendplantshop.dto.request.users.RegisterDtoRequest;
 import com.example.backendplantshop.dto.request.users.UserDtoRequest;
-import com.example.backendplantshop.dto.respones.user.LoginDtoResponse;
-import com.example.backendplantshop.dto.respones.user.UserDtoResponse;
+import com.example.backendplantshop.dto.response.user.LoginDtoResponse;
+import com.example.backendplantshop.dto.response.user.UserDtoResponse;
 
 import java.util.List;
 

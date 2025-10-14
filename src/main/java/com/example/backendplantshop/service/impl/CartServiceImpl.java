@@ -13,25 +13,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
     private final CartMapper cartMapper;
-    private final JwtUtil jwtUtil;
-    
+    private final AuthServiceImpl authService;
     @Override
     public Carts findCartByUserId(int userId, String authHeader) {
-        // Lấy token từ Authorization header
-        String token = (authHeader != null && authHeader.startsWith("Bearer "))
-                ? authHeader.substring(7)
-                : null;
-
-        if (token == null || !jwtUtil.validateToken(token) || !jwtUtil.isAccessToken(token)) {
-            throw new AppException(ErrorCode.AUTHENTICATION_ERROR);
-        }
-
-        // Lấy thông tin user từ token
-        int currentUserId = jwtUtil.extractUserId(token);
-
-
-        // USER chỉ có thể xem giỏ hàng của chính mình
-        if (currentUserId != userId) {
+        int currentUserId = authService.getCurrentUserId();
+        String role = authService.getCurrentRole();
+        if (!authService.isUser(role) || currentUserId != userId) {
             throw new AppException(ErrorCode.ACCESS_DENIED);
         }
 

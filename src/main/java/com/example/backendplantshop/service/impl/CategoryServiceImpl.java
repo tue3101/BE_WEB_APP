@@ -2,23 +2,23 @@ package com.example.backendplantshop.service.impl;
 
 import com.example.backendplantshop.convert.CategoryConvert;
 import com.example.backendplantshop.dto.request.CategoryDtoRequest;
-import com.example.backendplantshop.dto.respones.CategoryDtoResponse;
+import com.example.backendplantshop.dto.response.CategoryDtoResponse;
 import com.example.backendplantshop.entity.Category;
 import com.example.backendplantshop.enums.ErrorCode;
 import com.example.backendplantshop.exception.AppException;
 import com.example.backendplantshop.mapper.CategoryMapper;
 import com.example.backendplantshop.service.intf.CategoryService;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
-    @Autowired
+
     private final CategoryMapper categoryMapper;
+    private final AuthServiceImpl authService;
 
     public List<CategoryDtoResponse> getAllCategory(){
         var category = CategoryConvert.convertListCategoryToListCategoryDtoResponse(categoryMapper.getAll());
@@ -59,6 +59,10 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     public void insert(CategoryDtoRequest categoryRequest) {
+        String role = authService.getCurrentRole();
+        if (!authService.isAdmin(role) ) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
         // Validate input
         if (categoryRequest.getCategory_name() == null || categoryRequest.getCategory_name().trim().isEmpty()) {
             throw new AppException(ErrorCode.NAME_EMPTY);
@@ -73,6 +77,10 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     public void update(int id, CategoryDtoRequest categoryRequest) {
+        String role = authService.getCurrentRole();
+        if (!authService.isAdmin(role) ) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
         // Kiểm tra category cần update có tồn tại không
         Category existingCategory = categoryMapper.findById(id);
         if (existingCategory == null) {
@@ -90,6 +98,10 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     public void delete(int id){
+        String role = authService.getCurrentRole();
+        if (!authService.isAdmin(role) ) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
         if (categoryMapper.findById(id) == null) {
             throw new AppException(ErrorCode.CATEGORY_NOT_EXISTS);
         }
@@ -98,6 +110,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void restoreCategory(int id) {
+        String role = authService.getCurrentRole();
+        if (!authService.isAdmin(role) ) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
         if(categoryMapper.findByIdDeleted(id) == null){
             throw new AppException(ErrorCode.NOT_DELETE);
         }

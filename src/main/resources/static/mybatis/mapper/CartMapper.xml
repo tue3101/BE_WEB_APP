@@ -11,12 +11,12 @@
 
 
 <!--        dùng cho mối quan hệ 1-1-->
-        <association property="users" javaType="Users">
+        <!-- <association property="users" javaType="Users">
             <id property="user_id" column="user_id"/>
-        </association>
+        </association> -->
 
         <!-- 1-n: Cart -> CartDetails -->
-        <collection property="cart_details" ofType="CartDetails">
+        <!-- <collection property="cart_details" ofType="CartDetails">
             <id property="cart_detail_id" column="cart_detail_id"/>
             <result property="product_id" column="product_id"/>
             <result property="quantity" column="quantity"/>
@@ -25,7 +25,7 @@
             <result property="updated_at" column="cd_updated_at"/>
             <result property="is_deleted" column="is_deleted"/>
             <result property="cart_id" column="cd_cart_id"/>
-        </collection>
+        </collection> -->
     </resultMap>
     <!-- Các phần tử SQL-->
 <!--    <select id="findCartByUserId" resultMap="CartResultMap">-->
@@ -62,7 +62,7 @@
     <select id="findCartIdByUserId" parameterType="int" resultType="int">
         SELECT cart_id
         FROM carts
-        WHERE user_id = #{userId}
+        WHERE user_id = #{userID}
           AND is_deleted = false
             LIMIT 1
     </select>
@@ -70,10 +70,20 @@
     <!-- Tạo giỏ hàng mới cho user -->
     <insert id="createCartForUser" parameterType="int" >
         INSERT INTO carts (user_id)
-        VALUES (#{userId})
+        VALUES (#{userID})
     </insert>
 
 
-
+<delete id="deleteByUserId" parameterType="int">
+    UPDATE carts 
+    SET is_deleted = 1 
+    WHERE user_id = #{userID}
+</delete>
+    <update id="restoreByUserId" parameterType="int">
+        UPDATE carts
+        SET is_deleted = 0,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE user_id = #{userID}
+    </update>
 
 </mapper>

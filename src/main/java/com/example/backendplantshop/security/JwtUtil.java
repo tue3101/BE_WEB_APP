@@ -1,10 +1,8 @@
 package com.example.backendplantshop.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -15,11 +13,22 @@ import java.util.Map;
 
 @Component
 public class JwtUtil {
-    private static final String SECRET_KEY="nguyenngocthanhtuedh52112019nguyenngocthanhtuedh52112019"; // HS256 phải trên 32 ký tự
-    private static final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 15; // 15 phút
-    private static final long REFRESH_TOKEN_EXPIRATION = 1000 * 60 * 60 * 24 * 7; // 7 ngày
+//    private static final String SECRET_KEY="nguyenngocthanhtuedh52112019nguyenngocthanhtuedh52112019"; // HS256 phải trên 32 ký tự
+//    private static final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 60; // 1h
+//    private static final long REFRESH_TOKEN_EXPIRATION = 1000 * 60 * 60 * 24 * 7; // 7 ngày
 
-    private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    @Value("${jwt.secret}")
+    private String secretKey;
+
+    @Value("${jwt.access-expiration}")
+    private long accessTokenExpiration;
+
+    @Value("${jwt.refresh-expiration}")
+    private long refreshTokenExpiration;
+
+    private Key getSigningKey() {
+        return Keys.hmacShaKeyFor(secretKey.getBytes());
+    }
 
 
 
@@ -34,22 +43,22 @@ public class JwtUtil {
                 .setClaims(claims) //thêm payload
                 .setSubject(String.valueOf(user_id)) //định danh tính token
                 .setIssuedAt(new Date()) //ghi nhớ tgian tạo
-                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION)) //hết hạn
-                .signWith(key, SignatureAlgorithm.HS256) //ký token với thuật toán
+                .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiration)) //hết hạn
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256) //ký token với thuật toán
                 .compact(); //đóng gói thành chuỗi JWT
     }
 
-    public String generateRefreshToken(int user_id) {
+    public String generateRefreshToken(int user_id, String role) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("user_id", user_id);
+        claims.put("role", role);
         claims.put("type", "refresh");
         // claims.put("ver", getCurrentRefreshVersion(user_id));
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(String.valueOf(user_id))
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .setExpiration(new Date(System.currentTimeMillis() +refreshTokenExpiration))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -57,7 +66,7 @@ public class JwtUtil {
     private Claims extractAllClaims(String token) {
         //tạo JwtParserBuilder để giải mã và xác minh JWT
         return Jwts.parserBuilder()
-                .setSigningKey(key) //chỉ định để kiểm tra chữ ký
+                .setSigningKey(getSigningKey()) //chỉ định để kiểm tra chữ ký
                 .build() //Xây dựng JwtParser từ builder.
                 .parseClaimsJws(token)//Giải mã và phân tích chuỗi token , ktr hạn
                 .getBody(); //lấy ra phần payload
@@ -78,16 +87,29 @@ public class JwtUtil {
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
-                    .setSigningKey(key)
+                    .setSigningKey(getSigningKey())
                     .build()
                     .parseClaimsJws(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
+        }catch (ExpiredJwtException e) {
+            System.out.println("Token expired!");
+            return false;
+        } catch (UnsupportedJwtException e) {
+            System.out.println("Unsupported JWT!");
+            return false;
+        } catch (MalformedJwtException e) {
+            System.out.println("Malformed JWT!");
+            return false;
+        } catch (SignatureException e) {
+            System.out.println("Invalid signature!");
+            return false;
+        } catch (IllegalArgumentException e) {
+            System.out.println("Token is null or empty!");
             return false;
         }
     }
 
-    // Kiểm tra token có phải access token không
+//    // Kiểm tra token có phải access token không
     public boolean isAccessToken(String token) {
         try {
             Claims claims = extractAllClaims(token);
@@ -96,16 +118,16 @@ public class JwtUtil {
             return false;
         }
     }
-
-    // Kiểm tra token có phải refresh token không
-    public boolean isRefreshToken(String token) {
-        try {
-            Claims claims = extractAllClaims(token);
-            return "refresh".equals(claims.get("type", String.class));
-        } catch (Exception e) {
-            return false;
-        }
-    }
+//
+//    // Kiểm tra token có phải refresh token không
+//    public boolean isRefreshToken(String token) {
+//        try {
+//            Claims claims = extractAllClaims(token);
+//            return "refresh".equals(claims.get("type", String.class));
+//        } catch (Exception e) {
+//            return false;
+//        }
+//    }
 
 
 }

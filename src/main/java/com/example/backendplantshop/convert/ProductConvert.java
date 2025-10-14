@@ -1,7 +1,7 @@
 package com.example.backendplantshop.convert;
 
 import com.example.backendplantshop.dto.request.ProductDtoRequest;
-import com.example.backendplantshop.dto.respones.ProductDtoResponse;
+import com.example.backendplantshop.dto.response.ProductDtoResponse;
 import com.example.backendplantshop.entity.Products;
 
 import java.time.LocalDateTime;
@@ -19,7 +19,7 @@ public class ProductConvert {
                 .price(product.getPrice())
                 .quantity(product.getQuantity())
                 .size(product.getSize())
-                .out_of_stock(product.getOut_of_stock())
+                .out_of_stock(product.isOut_of_stock())
                 .category_id(product.getCategory_id())
                 .build();
     }

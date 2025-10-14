@@ -1,7 +1,7 @@
 package com.example.backendplantshop.exception;
 
 
-import com.example.backendplantshop.dto.respones.ApiResponse;
+import com.example.backendplantshop.dto.response.ApiResponse;
 import com.example.backendplantshop.enums.ErrorCode;
 
 import jakarta.servlet.http.HttpServletRequest;

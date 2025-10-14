@@ -1,5 +1,6 @@
 package com.example.backendplantshop.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +20,7 @@ public class Category {
     private LocalDateTime created_at;
     private Boolean is_deleted;
 
-//    @JsonManagedReference
+    @JsonManagedReference
     private List<Products>  products;
 
 

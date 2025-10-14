@@ -1,7 +1,7 @@
 package com.example.backendplantshop.service.intf;
 
 import com.example.backendplantshop.dto.request.CategoryDtoRequest;
-import com.example.backendplantshop.dto.respones.CategoryDtoResponse;
+import com.example.backendplantshop.dto.response.CategoryDtoResponse;
 import com.example.backendplantshop.entity.Category;
 
 import java.util.List;

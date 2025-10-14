@@ -22,7 +22,7 @@
 
     <select id="findById" resultMap="ProductResultMap" parameterType="integer">
         select p.product_id
-            ,p.product_name
+             ,p.product_name
              ,p.description
              ,p.img_url
              ,p.price
@@ -35,12 +35,12 @@
              ,p.category_id
         from products p
         where p.product_id = #{productID}
-        AND is_deleted = false
+          AND is_deleted = false
     </select>
-    
+
     <select id="findByProductNameAndSize" resultMap="ProductResultMap">
         select p.product_id
-            ,p.product_name
+             ,p.product_name
              ,p.description
              ,p.img_url
              ,p.price
@@ -52,12 +52,12 @@
              ,p.is_deleted
              ,p.category_id
         from products p
-        where p.product_name = #{productName} 
-        and p.size = #{size}
-        and p.category_id = #{categoryId}
-        and p.is_deleted = false
+        where p.product_name = #{productName}
+          and p.size = #{size}
+          and p.category_id = #{categoryId}
+          and p.is_deleted = false
     </select>
-    
+
     <select id="getAll" resultMap="ProductResultMap">
         SELECT product_id
              , product_name
@@ -77,25 +77,25 @@
 
     <insert id="insert" parameterType="Products">
         INSERT INTO products(
-            product_name
-            ,description
-            ,img_url
-            ,price
-            ,quantity
-            ,size
-            ,category_id
+                              product_name
+                            ,description
+                            ,img_url
+                            ,price
+                            ,quantity
+                            ,size
+                            ,category_id
         )
         VALUES (
-                   #{product_name}
-                    ,#{description}
-                    ,#{img_url}
-                    ,#{price}
-                    ,#{quantity}
-                    ,#{size}
-                    ,#{category_id}
+                 #{product_name}
+               ,#{description}
+               ,#{img_url}
+               ,#{price}
+               ,#{quantity}
+               ,#{size}
+               ,#{category_id}
                )
     </insert>
-    
+
     <update id="update" parameterType="Products">
         UPDATE products
         SET product_name = #{product_name},

@@ -1,11 +1,9 @@
 package com.example.backendplantshop.controller;
 
 import com.example.backendplantshop.dto.request.ProductDtoRequest;
-import com.example.backendplantshop.dto.respones.ApiResponse;
-import com.example.backendplantshop.dto.respones.ProductDtoResponse;
+import com.example.backendplantshop.dto.response.ApiResponse;
+import com.example.backendplantshop.dto.response.ProductDtoResponse;
 import com.example.backendplantshop.enums.ErrorCode;
-import com.example.backendplantshop.security.annotations.RequireAdmin;
-import com.example.backendplantshop.security.annotations.RequireUserOrAdmin;
 import com.example.backendplantshop.service.intf.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
@@ -28,7 +26,6 @@ public class ProductController {
     private ObjectMapper objectMapper; //tạo đối tượng dể chuyển json -> Object jva
 
     @GetMapping("/getall")
-    @RequireUserOrAdmin
     public ApiResponse<List<ProductDtoResponse>> goGetAllProduct() {
         return ApiResponse.<List<ProductDtoResponse>>builder()
                 .statusCode(ErrorCode.CALL_API_SUCCESSFULL.getCode())
@@ -38,8 +35,7 @@ public class ProductController {
                 .build();
     }
 
-    @GetMapping("getbybid/{id}")
-    @RequireUserOrAdmin
+    @GetMapping("/get-by-id/{id}")
     public ApiResponse<ProductDtoResponse> doGetProductById(@PathVariable("id") int id) {
         return ApiResponse.<ProductDtoResponse>builder()
                 .statusCode(ErrorCode.CALL_API_SUCCESSFULL.getCode())
@@ -50,10 +46,10 @@ public class ProductController {
     }
 
     @PostMapping(value = "/add")
-    @RequireAdmin
     public ApiResponse<Void> doInsertProduct(
             @RequestParam("product") String productJson,  // nhận JSON string
-            @RequestPart("image") MultipartFile image) throws IOException { //dùng multipartFile để upload hình ảnh
+            @RequestPart("image") MultipartFile image
+            ) throws IOException { //dùng multipartFile để upload hình ảnh
 
         // Parse JSON string thành ProductRequest object
         ProductDtoRequest productRequest = objectMapper.readValue(productJson, ProductDtoRequest.class);
@@ -68,7 +64,6 @@ public class ProductController {
     }
 
     @PutMapping("/update/{id}")
-    @RequireAdmin
     public ApiResponse<Void> doUpdateProduct(
             @PathVariable("id") int id,
             @RequestParam("product") String productJson,  // nhận JSON string
@@ -88,7 +83,6 @@ public class ProductController {
     }
 
     @DeleteMapping("/delete/{id}")
-    @RequireAdmin
     public ApiResponse<Void> doDeleteProduct(@PathVariable("id") int id) {
         productService.delete(id);
         return ApiResponse.<Void>builder()
@@ -99,7 +93,6 @@ public class ProductController {
     }
 
     @PutMapping("/restore/{id}")
-    @RequireAdmin
     ApiResponse<Void> restore(@PathVariable("id") int id) {
         productService.restoreProduct(id);
         return ApiResponse.<Void>builder()

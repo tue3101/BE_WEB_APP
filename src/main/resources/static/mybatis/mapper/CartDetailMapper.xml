@@ -16,7 +16,7 @@
 
 
         <!-- 1-1: CartDetail -> Product -->
-        <association property="products" javaType="Products">
+        <!-- <association property="products" javaType="Products">
         <id property="product_id" column="product_id"/>
         <result property="product_name" column="product_name"/>
         <result property="description" column="description"/>
@@ -28,8 +28,9 @@
         <result property="is_deleted" column="p_is_deleted"/>
         <result property="created_at" column="p_created_at"/>
         <result property="updated_at" column="p_updated_at"/>
-        </association>
+        </association> -->
     </resultMap>
+    
     <select id="findCartDetailByCartId" parameterType="int" resultMap="CartDetailResultMap">
         SELECT
             cd.cart_detail_id,
@@ -41,24 +42,32 @@
             cd.updated_at,
             cd.is_deleted,
 
-            p.product_id
-            p.product_name,
-            p.description,
-            p.img_url,
-            p.price,
-            p.quantity AS p_quantity,
-            p.size,
-            p.out_of_stock,
-            p.is_deleted AS p_is_deleted,
-            p.created_at AS p_created_at,
-            p.updated_at AS p_updated_at,
+                        p.product_id,
+                        p.product_name,
+                        p.description,
+                        p.img_url,
+                        p.price,
+                        p.quantity AS p_quantity,
+                        p.size,
+                        p.out_of_stock,
+                        p.is_deleted AS p_is_deleted,
+                        p.created_at AS p_created_at,
+                        p.updated_at AS p_updated_at
 
         FROM cart_details cd
                  JOIN products p ON cd.product_id = p.product_id
-        WHERE cd.cart_id = #{cartId}
+        WHERE cd.cart_id = #{cartID}
           AND cd.is_deleted = false
     </select>
-    
+    <select id="findQuantityInCart" resultType="int">
+        SELECT quantity
+        FROM cart_details
+        WHERE cart_id = #{cartID}
+          AND product_id = #{productID}
+          AND is_deleted = false
+    </select>
+
+
     <insert id="insetProductToCart">
         INSERT INTO cart_details (
                                   cart_id
@@ -68,8 +77,8 @@
                                  , updated_at
                                  )
         VALUES (
-                #{cartId}
-               , #{productId}
+                #{cartID}
+               , #{productID}
                , #{quantity}
                , NOW()
                , NOW()
@@ -78,6 +87,48 @@
                                  quantity = quantity + VALUES(quantity),
                                  updated_at = NOW();
 
+
     </insert>
 
+
+     <!-- Lấy số lượng tồn kho của sản phẩm -->
+    <select id="findProductQuantityInStock" parameterType="int" resultType="int">
+        SELECT quantity FROM products WHERE product_id = #{productID}
+    </select>
+
+
+    <update id="updateQuantity">
+        UPDATE cart_details
+        SET quantity = #{quantity}, updated_at = NOW()
+        WHERE cart_id = #{cartID} AND product_id = #{productID} AND is_deleted = false
+    </update>
+
+    <update id="increaseQuantity">
+        UPDATE cart_details
+        SET quantity = quantity + 1, updated_at = NOW()
+        WHERE cart_id = #{cartID} AND product_id = #{productID} AND is_deleted = false
+    </update>
+
+    <update id="decreaseQuantity">
+        UPDATE cart_details
+        SET quantity = quantity - 1, updated_at = NOW()
+        WHERE cart_id = #{cartID} AND product_id = #{productID} AND is_deleted = false AND quantity > 1
+    </update>
+
+<delete id="deleteByUserId" parameterType="int">
+    UPDATE cart_details 
+    SET is_deleted = 1 
+    WHERE cart_id IN (
+        SELECT cart_id FROM carts WHERE user_id = #{userID}
+    )
+</delete>
+
+   <update id="restoreByUserId" parameterType="int">
+    UPDATE cart_details 
+    SET is_deleted = 0,
+        updated_at = CURRENT_TIMESTAMP
+    WHERE cart_id IN (
+        SELECT cart_id FROM carts WHERE user_id = #{userID}
+    )
+</update>
 </mapper>

@@ -1,7 +1,7 @@
 package com.example.backendplantshop.service.intf;
 
 import com.example.backendplantshop.dto.request.DiscountDtoRequest;
-import com.example.backendplantshop.dto.respones.DiscountDtoResponse;
+import com.example.backendplantshop.dto.response.DiscountDtoResponse;
 
 import java.util.List;
 

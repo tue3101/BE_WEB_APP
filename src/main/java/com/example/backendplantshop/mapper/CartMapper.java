@@ -7,7 +7,11 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface CartMapper {
     Carts findCartByUserId(@Param("userID") int userId);
-    Integer findCartIdByUserId(@Param("userId") int userId);
+    Integer findCartIdByUserId(@Param("userID") int userId);
 
-    void createCartForUser(@Param("userId") int userId);
+    void deleteByUserId(@Param("userID") int userId);
+
+    void createCartForUser(@Param("userID") int userId);
+    void restoreByUserId(@Param("userID") int userId);
+
 }

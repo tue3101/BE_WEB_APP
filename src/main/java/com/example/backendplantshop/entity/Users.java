@@ -1,6 +1,7 @@
 package com.example.backendplantshop.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,10 +26,10 @@ public class Users {
     private LocalDateTime updated_at;
     private Boolean is_deleted;
 
-//    @JsonManagedReference
+    @JsonManagedReference
     private Carts cart;
 
-//    @JsonManagedReference
+    @JsonManagedReference
     private List<UserTokens> user_tokens;
 
 }

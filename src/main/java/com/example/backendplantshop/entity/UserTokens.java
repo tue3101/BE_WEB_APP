@@ -1,5 +1,6 @@
 package com.example.backendplantshop.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +20,6 @@ public class UserTokens {
     private Boolean revoked;
     private LocalDateTime created_at;
 
-//    @JsonBackReference
+    @JsonBackReference
     private Users users;
 }
