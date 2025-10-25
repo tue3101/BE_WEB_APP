@@ -24,6 +24,7 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     private final AuthServiceImpl authService;
+    private final CloudinaryServiceImpl cloudinaryService;
 
 
     private final CategoryServiceImpl categoryServiceImpl;
@@ -227,30 +228,44 @@ public class ProductServiceImpl implements ProductService {
         productMapper.delete(id);
     }
 
-    // Phương thức xử lý ảnh
-    private String processImage(MultipartFile image, String defaultImgUrl) throws IOException {
+    private String processImage(MultipartFile image, String defaultImgUrl) {
         if (image != null && !image.isEmpty()) {
-            // Thư mục lưu ảnh runtime
-            //user.dir là một thuộc tính của hệ thống Java dùng lấy đường dẫn gốc thư mục làm việc hiện tại và thêm images tạo đường dẫn
-            String uploadDir = System.getProperty("user.dir") + "/images/";
-            File uploadFolder = new File(uploadDir); //khởi tạo đối tượng đại diện đường dẫn
-
-            //nếu chưa tồn tại thì tạo mới thư mục
-            if (!uploadFolder.exists()) {
-                uploadFolder.mkdirs();
+            try {
+                return cloudinaryService.uploadImage(image, "plantshop/products");
+            } catch (Exception e) {
+                log.error("Error processing image", e);
+                throw new RuntimeException("Failed to process image", e);
             }
-
-            //tạo tên file mới để lưu ảnh (thời gian hiện tại _ tên file gốc)
-            String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
-            File dest = new File(uploadDir + fileName); //tạo đối tượng đại diện vị trí upload
-            image.transferTo(dest); //copy dữ liệu từ MultipartFile sang file vật lý
-            
-            return "/images/" + fileName;
         } else {
             // Nếu không có ảnh, sử dụng ảnh mặc định hoặc để trống
             return defaultImgUrl != null ? defaultImgUrl : "";
         }
     }
+
+    // Phương thức xử lý ảnh
+//    private String processImage(MultipartFile image, String defaultImgUrl) throws IOException {
+//        if (image != null && !image.isEmpty()) {
+//            // Thư mục lưu ảnh runtime
+//            //user.dir là một thuộc tính của hệ thống Java dùng lấy đường dẫn gốc thư mục làm việc hiện tại và thêm images tạo đường dẫn
+//            String uploadDir = System.getProperty("user.dir") + "/images/";
+//            File uploadFolder = new File(uploadDir); //khởi tạo đối tượng đại diện đường dẫn
+//
+//            //nếu chưa tồn tại thì tạo mới thư mục
+//            if (!uploadFolder.exists()) {
+//                uploadFolder.mkdirs();
+//            }
+//
+//            //tạo tên file mới để lưu ảnh (thời gian hiện tại _ tên file gốc)
+//            String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
+//            File dest = new File(uploadDir + fileName); //tạo đối tượng đại diện vị trí upload
+//            image.transferTo(dest); //copy dữ liệu từ MultipartFile sang file vật lý
+//
+//            return "/images/" + fileName;
+//        } else {
+//            // Nếu không có ảnh, sử dụng ảnh mặc định hoặc để trống
+//            return defaultImgUrl != null ? defaultImgUrl : "";
+//        }
+//    }
 
     @Override
     public void restoreProduct(int id) {
