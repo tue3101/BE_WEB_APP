@@ -178,7 +178,6 @@ public class UserServiceImpl implements UserService {
         
     //     return findById(targetUserId);
     // }
-
     @Override
     public void restoreUser(int id) {
         if (!authService.isAdmin(authService.getCurrentRole())) {

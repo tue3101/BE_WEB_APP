@@ -12,6 +12,12 @@ spring:
       max-file-size: 5MB
       max-request-size: 5MB
 
+cloudinary:
+  cloud-name: diwedopog
+  api-key: 242373362494586
+  api-secret: BWQyhakCNdLksJGdM_DBSCDLCzU
+  secure: true
+
 jwt:
   secret: nguyenngocthanhtuedh52112019nguyenngocthanhtuedh52112019
   access-expiration: 3600000  # 1 giờ (ms)
